@@ -17,6 +17,7 @@ const ROW = 24;
 const LANE = 14;
 const PAD = 10;
 const RADIUS = 4;
+const LANE_COLORS = ['c0', 'c3', 'c1', 'c4', 'c2'];
 
 const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const toolbar = byId('toolbar');
@@ -114,8 +115,10 @@ function renderGraph(data: GraphData) {
 	const byHash = new Map(data.commits.map(c => [c.hash, c]));
 	const trunkLane = data.commits.find(c => c.refs.some(r => r.trunk))?.lane;
 	const headLane = byHash.get(data.head.hash)?.lane;
+	// Other lanes cycle through the theme's graph colours, most distinct first.
+	const pinnedLanes = new Set([trunkLane, headLane].filter(lane => lane !== undefined)).size;
 	const color = (lane: number) =>
-		lane === trunkLane ? 'trunk' : lane === headLane ? 'head' : `c${lane % 5}`;
+		lane === trunkLane ? 'trunk' : lane === headLane ? 'head' : LANE_COLORS[(lane - pinnedLanes) % LANE_COLORS.length];
 	const x = (lane: number) => PAD + lane * LANE + LANE / 2;
 	const y = (row: number) => row * ROW + ROW / 2;
 

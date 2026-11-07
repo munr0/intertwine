@@ -1,4 +1,4 @@
-import { execFile } from 'child_process';
+import { spawn } from 'child_process';
 import * as path from 'path';
 
 export class GitError extends Error {
@@ -19,23 +19,31 @@ export class Git {
 
 	run(args: string[], options: RunOptions = {}): Promise<string> {
 		return new Promise((resolve, reject) => {
-			const child = execFile(this.gitPath, args, {
+			const child = spawn(this.gitPath, args, {
 				cwd: this.cwd,
-				encoding: 'utf8',
-				maxBuffer: 512 * 1024 * 1024,
+				// Only open stdin when there is input: closing an unused pipe races git's exit and raises SIGPIPE.
+				stdio: [options.input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'],
 				timeout: options.timeoutMs,
 				// Never block on a credential prompt; fail instead.
 				env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
-			}, (error, stdout, stderr) => {
-				if (error) {
-					reject(new GitError(args, stderr || error.message));
+			});
+			const stdout: Buffer[] = [];
+			const stderr: Buffer[] = [];
+			child.stdout!.on('data', (chunk: Buffer) => stdout.push(chunk));
+			child.stderr!.on('data', (chunk: Buffer) => stderr.push(chunk));
+			child.on('error', error => reject(new GitError(args, error.message)));
+			child.on('close', (code, signal) => {
+				if (code === 0) {
+					resolve(Buffer.concat(stdout).toString('utf8'));
 				} else {
-					resolve(stdout);
+					reject(new GitError(args, Buffer.concat(stderr).toString('utf8') || `exited with ${signal ?? code}`));
 				}
 			});
-			// If git exits before reading stdin, the write fails with EPIPE; the exit callback reports it.
-			child.stdin?.on('error', () => {});
-			child.stdin?.end(options.input ?? '');
+			if (options.input !== undefined) {
+				// If git exits before reading all of it, the write fails with EPIPE; 'close' reports the exit.
+				child.stdin!.on('error', () => {});
+				child.stdin!.end(options.input);
+			}
 		});
 	}
 
