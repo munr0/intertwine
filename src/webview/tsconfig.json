@@ -1,0 +1,13 @@
+{
+	// Browser code for the graph webview. Type-checked here; bundled by esbuild.
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"target": "ES2022",
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"types": [],
+		"strict": true,
+		"noEmit": true
+	},
+	"include": ["./**/*.ts", "../protocol.ts"]
+}

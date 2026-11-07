@@ -1,4 +1,5 @@
 import { execFile } from 'child_process';
+import * as path from 'path';
 
 export class GitError extends Error {
 	constructor(readonly args: readonly string[], readonly stderr: string) {
@@ -36,6 +37,12 @@ export class Git {
 			child.stdin?.on('error', () => {});
 			child.stdin?.end(options.input ?? '');
 		});
+	}
+
+	/** Absolute paths of this worktree's git directory and the directory shared by all worktrees. */
+	async dirs(): Promise<{ gitDir: string; commonDir: string }> {
+		const [gitDir, commonDir] = (await this.run(['rev-parse', '--absolute-git-dir', '--git-common-dir'])).split('\n');
+		return { gitDir, commonDir: path.resolve(this.cwd, commonDir) };
 	}
 
 	/** Like `run`, but resolves to null instead of rejecting. For probes such as `rev-parse --verify`. */

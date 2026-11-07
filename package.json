@@ -1,23 +1,133 @@
 {
   "name": "intertwine",
   "displayName": "Intertwine",
-  "description": "lorem ipsum",
+  "description": "A live commit graph of only the branches entangled with yours, shaded by sync state, to keep beside your Git terminal.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.125.0"
   },
   "categories": [
-    "Other"
+    "SCM Providers",
+    "Visualization"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
   "main": "./dist/extension.js",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
   "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "intertwine",
+          "title": "Intertwine",
+          "icon": "media/intertwine.svg"
+        }
+      ]
+    },
+    "views": {
+      "intertwine": [
+        {
+          "type": "webview",
+          "id": "intertwine.graph",
+          "name": "Graph"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "intertwine.helloWorld",
-        "title": "Hello World"
+        "command": "intertwine.toggleFocusMode",
+        "title": "Toggle Focus Mode",
+        "category": "Intertwine",
+        "icon": "$(screen-full)"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "intertwine.toggleFocusMode",
+          "when": "view == intertwine.graph",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "intertwine.toggleFocusMode",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "args": {
+          "sideBar": true,
+          "auxiliaryBar": true
+        },
+        "when": "!intertwine.focusMode && sideBarVisible && auxiliaryBarVisible"
+      },
+      {
+        "command": "intertwine.toggleFocusMode",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "args": {
+          "sideBar": true,
+          "auxiliaryBar": false
+        },
+        "when": "!intertwine.focusMode && sideBarVisible && !auxiliaryBarVisible"
+      },
+      {
+        "command": "intertwine.toggleFocusMode",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "args": {
+          "sideBar": false,
+          "auxiliaryBar": true
+        },
+        "when": "!intertwine.focusMode && !sideBarVisible && auxiliaryBarVisible"
+      },
+      {
+        "command": "intertwine.toggleFocusMode",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "args": {
+          "sideBar": false,
+          "auxiliaryBar": false
+        },
+        "when": "!intertwine.focusMode && !sideBarVisible && !auxiliaryBarVisible"
+      },
+      {
+        "command": "intertwine.toggleFocusMode",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "when": "intertwine.focusMode"
+      }
+    ],
+    "configuration": {
+      "title": "Intertwine",
+      "properties": {
+        "intertwine.trunk": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Trunk branch, such as `origin/develop` or `main`. Leave empty to use `origin/HEAD`, then `main`, then `master`."
+        },
+        "intertwine.trunkContext": {
+          "type": "number",
+          "default": 10,
+          "minimum": 0,
+          "description": "Trunk commits to show below the oldest point where a shown branch leaves trunk."
+        },
+        "intertwine.fetch.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Run `git fetch --all --prune` in the background while the graph is visible, so teammates' new work appears."
+        },
+        "intertwine.fetch.intervalMinutes": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "description": "Minutes between background fetches."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -29,24 +139,29 @@
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit && tsc --noEmit -p src/webview",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "watch:tsc-webview": "tsc --noEmit --watch --project src/webview/tsconfig.json"
   },
   "devDependencies": {
-    "@types/vscode": "^1.125.0",
+    "@types/d3-selection": "^3.0.12",
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
-    "typescript-eslint": "^8.61.1",
-    "eslint": "^10.5.0",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
     "esbuild": "^0.28.1",
+    "eslint": "^10.5.0",
     "npm-run-all": "^4.1.5",
     "typescript": "^6.0.3",
-    "@vscode/test-cli": "^0.0.15",
-    "@vscode/test-electron": "^3.0.0"
+    "typescript-eslint": "^8.61.1"
   },
   "overrides": {
     "diff": "^8.0.4",
     "serialize-javascript": "^7.0.6"
+  },
+  "dependencies": {
+    "d3-selection": "^3.0.1"
   }
 }

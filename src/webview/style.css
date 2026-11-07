@@ -1,0 +1,238 @@
+:root {
+	--row: 24px;
+	--trunk: var(--vscode-scmGraph-historyItemBaseRefColor, #b180d7);
+	--head: var(--vscode-scmGraph-historyItemRefColor, #59a4f9);
+	--c0: var(--vscode-scmGraph-foreground1, #ffb000);
+	--c1: var(--vscode-scmGraph-foreground2, #dc267f);
+	--c2: var(--vscode-scmGraph-foreground3, #994f00);
+	--c3: var(--vscode-scmGraph-foreground4, #40b0a6);
+	--c4: var(--vscode-scmGraph-foreground5, #b66dff);
+	--surface: var(--vscode-panel-background, var(--vscode-editor-background));
+}
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	font-family: var(--vscode-font-family);
+	font-size: var(--vscode-font-size);
+	color: var(--vscode-foreground);
+}
+
+[hidden] {
+	display: none !important;
+}
+
+#toolbar {
+	flex: none;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 8px;
+}
+
+select {
+	max-width: 40ch;
+	padding: 2px 4px;
+	font: inherit;
+	color: var(--vscode-dropdown-foreground);
+	background: var(--vscode-dropdown-background);
+	border: 1px solid var(--vscode-dropdown-border, transparent);
+	border-radius: 2px;
+}
+
+select:focus {
+	outline: 1px solid var(--vscode-focusBorder);
+	outline-offset: -1px;
+}
+
+.muted {
+	color: var(--vscode-descriptionForeground);
+}
+
+#status {
+	color: var(--vscode-editorWarning-foreground);
+	cursor: default;
+}
+
+#notice {
+	flex: none;
+	padding: 4px 8px;
+	color: var(--vscode-descriptionForeground);
+}
+
+#empty {
+	padding: 16px;
+	color: var(--vscode-descriptionForeground);
+}
+
+#scroller {
+	flex: 1;
+	overflow: auto;
+}
+
+#canvas {
+	position: relative;
+	min-width: 100%;
+}
+
+#graph {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+	overflow: visible;
+}
+
+/* Rows span the full width so the graph area is clickable too; text starts after the lanes. */
+.row {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	box-sizing: border-box;
+	height: var(--row);
+	padding: 0 8px 0 var(--graph-width);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.row:hover {
+	background: var(--vscode-list-hoverBackground);
+}
+
+.row:focus {
+	outline: 1px solid var(--vscode-focusBorder);
+	outline-offset: -1px;
+}
+
+.row.remote .subject,
+.row.remote .meta {
+	opacity: 0.55;
+}
+
+.refs {
+	display: contents;
+}
+
+.ref {
+	flex: none;
+	padding: 0 4px;
+	font-size: 0.85em;
+	line-height: 16px;
+	color: var(--lane);
+	border: 1px solid var(--lane);
+	border-radius: 3px;
+}
+
+.ref.head {
+	font-weight: 600;
+}
+
+.ref.remote {
+	opacity: 0.7;
+}
+
+.subject {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.meta {
+	flex: none;
+	font-size: 0.9em;
+	color: var(--vscode-descriptionForeground);
+}
+
+.date {
+	min-width: 3ch;
+	text-align: right;
+}
+
+.lane-trunk { --lane: var(--trunk); }
+.lane-head { --lane: var(--head); }
+.lane-c0 { --lane: var(--c0); }
+.lane-c1 { --lane: var(--c1); }
+.lane-c2 { --lane: var(--c2); }
+.lane-c3 { --lane: var(--c3); }
+.lane-c4 { --lane: var(--c4); }
+
+/* Sync state: pushed is solid, local only is dashed, remote only is faint. */
+.edge {
+	fill: none;
+	stroke: var(--lane);
+	stroke-width: 1.5;
+}
+
+.edge.local {
+	stroke-dasharray: 3 2;
+}
+
+.edge.remote {
+	opacity: 0.35;
+}
+
+.edge.stub {
+	stroke-dasharray: 1 3;
+	opacity: 0.6;
+}
+
+.node .dot {
+	fill: var(--lane);
+	stroke: var(--lane);
+	stroke-width: 1.5;
+}
+
+.node.local .dot {
+	fill: var(--surface);
+	stroke-dasharray: 2 1.5;
+}
+
+.node.remote {
+	opacity: 0.35;
+}
+
+.node .ring {
+	fill: none;
+	stroke: none;
+}
+
+.node.head .ring {
+	stroke: var(--lane);
+	stroke-width: 1.5;
+}
+
+#tooltip {
+	position: fixed;
+	z-index: 10;
+	max-width: min(60ch, calc(100vw - 16px));
+	padding: 6px 8px;
+	color: var(--vscode-editorHoverWidget-foreground);
+	background: var(--vscode-editorHoverWidget-background);
+	border: 1px solid var(--vscode-editorHoverWidget-border);
+	border-radius: 3px;
+	pointer-events: none;
+}
+
+.tip-meta {
+	color: var(--vscode-descriptionForeground);
+	font-size: 0.9em;
+}
+
+.tip-message {
+	margin-top: 4px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
