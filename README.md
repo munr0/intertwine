@@ -1,71 +1,64 @@
 # Intertwine
 
-This is the README for your extension "Intertwine". After writing up a brief description, we recommend including the following sections.
+A Visual Studio Code extension that shows a live commit graph of only the branches entangled with yours, shaded by sync state.
+
+Keep it beside a Git terminal: you type the commands, and the graph keeps up. Other graphs show every branch, or only yours. Intertwine answers "whose work is tangled up with mine right now, and what state is it in?"
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- Shows trunk, your branch, and every local or remote branch that shares a non-trunk commit with yours. Everything else is hidden.
+- Draws where each commit lives: **solid** is local and pushed, **dashed** is local only, **faint** is remote only.
+- Redraws after each `git` command in the terminal, and after Git changes made anywhere else.
+- Fetches in the background while the graph is visible, so teammates' new work appears.
+- Click a commit to open its changes in the multi-file diff view. Hover for the full message.
+- Switch branches from the dropdown. If uncommitted changes are in the way, stash and switch in one step.
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
 
-\!\[feature X\]\(images/feature-x.png\)
+### Open the graph
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+Intertwine adds a tab to the bottom panel. Run **Intertwine: Toggle Focus Mode** to focus the graph, hide the sidebars and maximize the panel. Run it again to put everything back. Editor tabs are never closed or moved.
 
-## Requirements
+Toggle it with <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>G</kbd> (<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>G</kbd> on macOS), the **Intertwine** item in the status bar, or the button in the graph's title bar.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Put the terminal beside the graph
 
-## Extension Settings
+Drag the **Terminal** tab into the graph to show both side by side in one panel. VS Code remembers the layout.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+### Choose the trunk
 
-For example:
+Trunk is `origin/HEAD`, then `main`, then `master`. Set `intertwine.trunk` to use another branch.
 
-This extension contributes the following settings:
+## Settings
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- `intertwine.trunk` – trunk branch, such as `origin/develop` (default: detect)
+- `intertwine.trunkContext` – trunk commits shown below the oldest fork point (default: 10)
+- `intertwine.fetch.enabled` – fetch in the background while the graph is visible (default: on)
+- `intertwine.fetch.intervalMinutes` – minutes between fetches (default: 5)
 
-## Known Issues
+## Development
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+```bash
+npm install
+```
 
-## Release Notes
+Press <kbd>F5</kbd> to run the extension in a new window.
 
-Users appreciate release notes as you update your extension.
+```bash
+npm test
+```
 
-### 1.0.0
+Runs the smoke test in a downloaded VS Code. On Linux without a display, prefix it with `xvfb-run -a`.
 
-Initial release of ...
+```bash
+npm run compile-tests && node out/cli.js /path/to/repo
+```
 
-### 1.0.1
+Prints the graph for a repository as JSON, without VS Code. Add `--trunk <ref>` or `--context <n>` to override the settings.
 
-Fixed issue #.
+Code layout:
 
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- `src/core/` – all Git logic, with no VS Code imports
+- `src/extension/` – the view, refresh triggers, background fetch, focus mode and branch switching
+- `src/webview/` – the graph, drawn with d3
+- `src/protocol.ts` – types shared by all three

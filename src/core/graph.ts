@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { BranchOption, GraphCommit, GraphData, Operation, RefLabel } from '../protocol';
+import type { GraphCommit, GraphData, Operation, RefLabel } from '../protocol';
 import { Git } from './git';
 import { layout } from './layout';
 
@@ -111,10 +111,10 @@ export async function buildGraph(git: Git, options: GraphOptions = {}): Promise<
 	}));
 	graphCommits.sort((a, b) => a.row - b.row);
 
-	const branches: BranchOption[] = refs
+	const branches = refs
 		.filter(r => r.name.startsWith('refs/heads/'))
-		.map(r => ({ name: shortName(r.name), committerTime: r.committerTime }))
-		.sort((a, b) => b.committerTime - a.committerTime || a.name.localeCompare(b.name));
+		.sort((a, b) => b.committerTime - a.committerTime || a.name.localeCompare(b.name))
+		.map(r => shortName(r.name));
 
 	return {
 		trunk: trunk ? shortName(trunk.name) : null,

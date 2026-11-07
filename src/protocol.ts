@@ -31,12 +31,6 @@ export interface GraphCommit {
 	lane: number;
 }
 
-export interface BranchOption {
-	name: string;
-	/** Unix seconds of the tip commit. */
-	committerTime: number;
-}
-
 export interface GraphData {
 	/** Trunk as typed on the command line (`origin/main`), or null when none was found. */
 	trunk: string | null;
@@ -46,8 +40,8 @@ export interface GraphData {
 		branch: string | null;
 	};
 	operation: Operation | null;
-	/** Local branches, most recently committed first. */
-	branches: BranchOption[];
+	/** Local branch names, most recently committed first. */
+	branches: string[];
 	/** In row order, top to bottom. */
 	commits: GraphCommit[];
 	lanes: number;

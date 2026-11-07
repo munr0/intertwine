@@ -85,7 +85,7 @@ function render(data: GraphData) {
 }
 
 function renderSwitcher(data: GraphData) {
-	const options = data.branches.map(b => ({ value: b.name, label: b.name, disabled: false }));
+	const options = data.branches.map(name => ({ value: name, label: name, disabled: false }));
 	if (!data.head.branch) {
 		options.unshift({ value: '', label: `detached @ ${data.head.hash.slice(0, 7)}`, disabled: true });
 	}

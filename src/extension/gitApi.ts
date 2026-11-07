@@ -7,7 +7,7 @@ interface GitExtension {
 	getAPI(version: 1): API;
 }
 
-export type APIState = 'uninitialized' | 'initialized';
+type APIState = 'uninitialized' | 'initialized';
 
 export interface API {
 	readonly state: APIState;

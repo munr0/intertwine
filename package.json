@@ -2,7 +2,27 @@
   "name": "intertwine",
   "displayName": "Intertwine",
   "description": "A live commit graph of only the branches entangled with yours, shaded by sync state, to keep beside your Git terminal.",
+  "publisher": "munr0",
+  "keywords": [
+    "git",
+    "graph",
+    "branches",
+    "commit graph",
+    "git graph",
+    "history",
+    "log",
+    "rebase",
+    "scm",
+    "source control",
+    "terminal",
+    "visualization"
+  ],
   "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/munr0/intertwine.git"
+  },
   "engines": {
     "vscode": "^1.125.0"
   },

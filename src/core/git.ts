@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 export class GitError extends Error {
-	constructor(readonly args: readonly string[], readonly stderr: string) {
+	constructor(args: readonly string[], readonly stderr: string) {
 		super(stderr.trim() || `git ${args[0]} failed`);
 	}
 }
